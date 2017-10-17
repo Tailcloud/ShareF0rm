@@ -1,0 +1,23 @@
+{
+  "name": "f0rmbot",
+  "version": "1.0.0",
+  "description": "A bot to make request form.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tailcloud/ShareF0rm.git"
+  },
+  "author": "Yvonne Shih",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tailcloud/ShareF0rm/issues"
+  },
+  "homepage": "https://github.com/Tailcloud/ShareF0rm#readme",
+  "dependencies": {
+    "botbuilder": "^3.11.0",
+    "restify": "^6.2.0"
+  }
+}
