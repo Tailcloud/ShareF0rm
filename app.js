@@ -101,7 +101,7 @@ bot.dialog('newreq',[
     }else{
       session.conversationData.ReqSegment = results.response.entity;
     }
-      builder.Prompts.text(session,'Customer Name :')
+      builder.Prompts.text(session,'Customer Name(EX: 群光電子股份有限公司) :')
   },
   (session, results,next) => {
     if (session.conversationData.CustomerName) {
@@ -109,7 +109,7 @@ bot.dialog('newreq',[
     }else{
       session.conversationData.CustomerName = results.response;
     }
-      builder.Prompts.number(session,'Opportunity or Booking ID : ',{retryPrompt:'error type?'})
+      builder.Prompts.text(session,'Opportunity or Booking ID(EX: 7-OTWENTS5O) : ',{retryPrompt:'error type?'})
   },
   (session, results,next) => {
     if (session.conversationData.BookId) {
@@ -117,7 +117,7 @@ bot.dialog('newreq',[
     }else{
       session.conversationData.BookId = results.response;
     }
-      builder.Prompts.text(session,'Project Name :')
+      builder.Prompts.text(session,'Project Name :(EX: FY18-SAPonAzure)')
   },
   (session, results,next) => {
     if (session.conversationData.ProjectName) {
@@ -125,7 +125,7 @@ bot.dialog('newreq',[
     }else{
       session.conversationData.ProjectName = results.response;
     }
-      builder.Prompts.number(session,'Est. Rev (K in $USD) :\n If request is Azure rev. = single month ACR * 12, If request are others, rev. = billed rev. ',{retryPrompt:'請輸入數字好嗎'});
+      builder.Prompts.number(session,'Est. Rev (K in $USD) :\n If request is Azure rev. = single month ACR * 12, If request are others, rev. = billed rev.(EX: $50) : ',{retryPrompt:'請輸入數字好嗎'});
   },
   (session, results,next) => {
     if (session.conversationData.Rev) {
@@ -208,7 +208,7 @@ bot.dialog('newreq',[
     }else{
       session.conversationData.WorkSce = results.response.entity;
     }
-    builder.Prompts.text(session,'Business Justification:');
+    builder.Prompts.text(session,'Business Justification (EX: Bryan Lin-Confirm technical resource assigned and update request.) :');
   },
   (session, results,next) => {
     if (session.conversationData.Just) {
