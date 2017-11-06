@@ -223,23 +223,23 @@ bot.dialog('newreq',[
       next();
     }else{
       session.conversationData.PartnerType = results.response.entity;
+      MongoClient.connect(url, function(err, db) {
+        assert.equal(null,err);
+        console.log("connected correctly to server");
 
-    MongoClient.connect(url, function(err, db) {
-    assert.equal(null,err);
-    console.log("connected correctly to server");
+        var rscols = db.collection("partner");
+        rscols.distinct("Partner PDM",{"Partner Type":results.response.entity},function(err, items) {
+              if (err) {
+                console.log(err);
+                builder.Prompts.text(session,'Error in searching');
+              }else{
+                // console.log(items[0].password);
+                builder.Prompts.choice(session,'Partner PDM',items,{listStyle: builder.ListStyle.button});
 
-    var rscols = db.collection("partner");
-    rscols.distinct("Partner PDM",{"Partner Type":results.response.entity},function(err, items) {
-          if (err) {
-            console.log(err);
-            builder.Prompts.text(session,'Error in searching');
-          }else{
-            // console.log(items[0].password);
-            builder.Prompts.choice(session,'Partner PDM',items,{listStyle: builder.ListStyle.button});
-
-          }
-        });
-  });
+              }
+            });
+      });
+    }
    },
   (session, result,next) => {
     if (session.conversationData.PDM) {
