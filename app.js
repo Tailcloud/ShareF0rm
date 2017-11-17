@@ -13,6 +13,8 @@ var server = restify.createServer();
 var userName = "";
 var userEmail = "";
 var userToken = "";
+var request = require('request');
+
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
    console.log('%s listening to %s', server.name, server.url);
@@ -29,17 +31,25 @@ var connector = new builder.ChatConnector({
 
 // Listen for messages from users
 server.post('/api/messages', connector.listen());
-var bot = new builder.UniversalBot(connector,[function(session){
-  session.send("如果需要求助，請輸入help；如果要開始新的表單，請輸入newreq");
-}]);
+
+var bot = new builder.UniversalBot(connector,function(session){
+  session.send("如果要開始新的表單，請輸入newreq; 如果需要求助，請輸入help");
+});
+bot.on('conversationUpdate', function(update){
+    if (update.membersAdded) {
+        update.membersAdded.forEach(function (identity) {
+            if (identity.id === update.address.bot.id) {
+                bot.beginDialog(update.address, '/');
+            }
+        });
+    }
+});
 
 bot.dialog('help',[(session,args,next)=>{
   session.send("請問需要什麼幫助?");
 }]).triggerAction({
     matches: /^help$/i
 });
-// Enable Conversation Data persistence
-// bot.set('persistConversationData', true);
 
 bot.dialog('newreq',[
   (session) => {
@@ -139,7 +149,7 @@ bot.dialog('newreq',[
     if (session.conversationData.Dat) {
       next();
     }else{
-      session.conversationData.Dat = results.response;
+      session.conversationData.Dat = results.response.entity;
     }
     console.log(results.response.entity);
     builder.Prompts.choice(session,'Workload Type :','Apps & Infra (AI)|Business Applications (BA)|Data & Analytics (DA)|Modern Workplace (MW)',{listStyle: builder.ListStyle.button})
@@ -186,7 +196,6 @@ bot.dialog('newreq',[
     console.log("connected correctly to server");
 
     var worksce = db.collection("worksce");
-    // var cursor = events.find({"token":token});
     worksce.find({"workprac":results.response.entity}).toArray(function(err, items) {
           if (err) {
             res.status(500).send();
@@ -357,7 +366,21 @@ var tmparr=[];
                 "type": "Action.Submit",
                 "title": "OK",
                 'data':{
-                  'type':'date'
+                  'type':'send',
+                  "RequestType":session.conversationData.ReqType,
+                  "RequestSegment":session.conversationData.ReqSegment,
+                  "CustomerName":session.conversationData.CustomerName,
+                  "OpportunityoBookingID":session.conversationData.BookId,
+                  "ProjectName":session.conversationData.ProjectName,
+                  "EstRev":session.conversationData.Rev,
+                  "EstCDate":session.conversationData.Dat,
+                  "WorkloadType":session.conversationData.WorkType,
+                  "WorkloadPractice":session.conversationData.WorkPrac,
+                  "WorkloadScenario":session.conversationData.WorkSce,
+                  "BusinessJustification":session.conversationData.Just,
+                  "PartnerType":session.conversationData.PartnerType,
+                  "PartnerPDM":session.conversationData.PDM,
+                  "PartnerList":session.conversationData.List
                 }
               }
         ]
@@ -386,18 +409,42 @@ function processSubmitAction(session, value) {
           console.log("processSub: " + JSON.stringify(value));
           session.conversationData = value;
           session.beginDialog('newreq');
-        //     // Search, validate parameters
-        //     if (validateHotelSearch(value)) {
-        //         // proceed to search
-        //         session.beginDialog('-search', value);
-        //     } else {
-        //         session.send(defaultErrorMessage);
-        //     }
-        //     break;
-        // case '':
-        //     sendHotlection(session, value);
-            break;
+          break;
+        case 'send':
+        var tmpobj = {
+          "fields":{
+            "Title":value.RequestType,
+            "Requestsegment":value.RequestSegment,
+            "Customername":value.CustomerName,
+            "Opportunityid":value.OpportunityoBookingID,
+            "Projectname":value.ProjectName,
+            "Estrev":value.EstRev.toString(),
+            "Estclosedate":value.EstCDate,
+            "Worktype":value.WorkloadType,
+            "WorkScenario":value.WorkloadScenario,
+            "Partnertype":value.PartnerType,
+            "Businessjustification":value.BusinessJustification,
+            "Partnerpdm":value.PartnerPDM,
+            "Partnerlist":value.PartnerList
+
+          }
+        };
+        var defaultHeader = {
+          'Content-Type' : 'application/json',
+          'Authorization' : 'Bearer '+session.conversationData.userToken
+        };
+        request(
+            {
+                method : 'POST',
+                url : 'https://graph.microsoft.com/v1.0/sites/emsdemo29.sharepoint.com,23183802-4337-4716-a9ff-72833cf05612,60941ce0-3428-4215-9f81-096b1bc046cd/lists/Emilybot/items',
+                json : true,
+                headers : defaultHeader,
+                body:tmpobj
+            }
+        )
+          break;
         default:
             session.send(defaultErrorMessage);
     }
 }
+//tmp for get sharepoint group
