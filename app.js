@@ -1,6 +1,6 @@
 var restify = require('restify');
 var builder = require('botbuilder');
-var AuthenticationContext = require('adal-node').AuthenticationContext;
+// var AuthenticationContext = require('adal-node').AuthenticationContext;
 // setup database
 var MongoClient = require("mongodb").MongoClient;
 var assert = require('assert');
