@@ -14,6 +14,8 @@ var userName = "";
 var userEmail = "";
 var userToken = "";
 var request = require('request');
+const MICROSOFT_APP_ID = 'f72a999a-24a2-4154-b6de-835aec6adbaf';
+const MICROSOFT_APP_PASSWORD = 'Mu4H62kvb9w3Gg3By40p71Y';
 
 
 server.listen(process.env.port || process.env.PORT || 3978, function () {
